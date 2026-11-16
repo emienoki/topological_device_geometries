@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np  # type: ignore[reportMissingImports]
 from collections import deque
 from basic_physics.device_builder import bdg_hamiltonian
 from basic_physics.braiding_dynamics import plain_chain_device

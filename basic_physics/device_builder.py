@@ -71,7 +71,6 @@ def build_t_junction(theta: DeviceParams) -> Device:
         params=theta,
     )
 
-"""2Nx2N bdg hamiltonian for any deviec, generalizes kiteav_chain.py so both geometries can share !!"""
 def bdg_hamiltonian(device: Device) -> np.ndarray:
 
     N = device.n_sites
@@ -97,14 +96,7 @@ def bdg_hamiltonian(device: Device) -> np.ndarray:
 
 @dataclass
 class AncillaDotParams:
-    """
-    theta for the ancilla-dot architecture: two arms, each terminating at
-    its OWN bond to a shared ancilla site, rather than three arms meeting
-    at one physical junction. The ancilla's coupling to each arm is
-    independently tunable (t_ancilla, delta_ancilla) -- that tunability,
-    not a third physical wire, is what lets this architecture do the same
-    routing job a T-junction does, while keeping every site at degree <= 2.
-    """
+   
     N_per_arm: int = 15
     a: float = 10.0
     t: float = 1.0
@@ -122,22 +114,7 @@ class AncillaDotParams:
 
 
 def build_ancilla_dot(theta: AncillaDotParams) -> Device:
-    """
-    Build a 2-arm ancilla-dot device from theta.
 
-    Site layout:
-      site 0            = the ancilla dot (degree 2: one bond per arm)
-      sites 1 .. N        = arm A, ordered outward from the ancilla
-      sites N+1 .. 2N       = arm B
-
-    Sanity check this is designed to support: if t_ancilla == t and
-    delta_ancilla == delta (i.e. the ancilla behaves just like an ordinary
-    bulk site), this device is DEGREE-2 EVERYWHERE and should reduce to a
-    single uniform chain of length 2N+1 -- 2 clean end modes, none of the
-    T-junction's extra junction-localized states. That's the actual
-    structural claim behind "avoids the T-junction's poisoning liability";
-    it should be checked computationally, not assumed.
-    """
     N = theta.N_per_arm
     n_sites = 2 * N + 1
     ancilla = 0
@@ -147,14 +124,6 @@ def build_ancilla_dot(theta: AncillaDotParams) -> Device:
     for arm_idx, start in enumerate(arm_starts):
         delta_k = theta.delta * np.exp(1j * theta.phases[arm_idx])
         delta_anc_k = theta.delta_ancilla * np.exp(1j * theta.phases[arm_idx])
-        # This device is topologically a single straight line through the ancilla
-        # (unlike the T-junction's genuine 3-way branch), so ALL bonds need one
-        # consistent handedness along that line. Arm A runs high-index-to-low
-        # physically into the ancilla while arm B runs low-to-high out of it --
-        # writing both "outward from ancilla" (as the T-junction does) mismatches
-        # their relative sign. Fix: negate arm A's pairing amplitude to restore
-        # a single consistent handedness end-to-end. Verified against a plain
-        # reference chain, not just derived -- see conversation notes.
         sign = -1.0 if arm_idx == 0 else 1.0
         bonds.append((ancilla, start, theta.t_ancilla, sign * delta_anc_k))
         for k in range(N - 1):
@@ -199,8 +168,6 @@ if __name__ == "__main__":
     eigvals, eigvecs = near_zero_modes(device, n_modes=8)
     print(f"\n8 eigenvalues closest to zero:\n{eigvals}")
 
-    # Plot |u_i|^2 + |v_i|^2 for the modes nearest zero, across all sites,
-    # to see WHERE (if anywhere) they localize.
     N = device.n_sites
     sites = np.arange(N)
     plt.figure(figsize=(9, 5))

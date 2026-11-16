@@ -13,7 +13,6 @@ def plain_chain_device(N, t, delta, site_mu):
 
 
 def wall_mu_profile(N, wall_position, width, mu_topo, mu_triv):
-    """Smoothed step: mu_topo well left of wall_position, mu_triv well right."""
     sites = np.arange(N)
     frac = 0.5 * (1 + np.tanh((sites - wall_position) / width))
     return mu_topo + (mu_triv - mu_topo) * frac
@@ -48,7 +47,6 @@ def localized_zero_mode(H, N, target_site, n_search=6, degeneracy_tol=1e-6):
 
 
 def min_gap_along_sweep(N, t, delta, mu_topo, mu_triv, width, k0, k1, n_check=30):
-    """Instantaneous gap to the nearest excited (non-near-zero) state,"""
     gaps = []
     for s in np.linspace(0, 1, n_check):
         wall = k0 + (k1 - k0) * s
@@ -61,9 +59,6 @@ def min_gap_along_sweep(N, t, delta, mu_topo, mu_triv, width, k0, k1, n_check=30
 
 
 def simulate_sweep(N, t, delta, mu_topo, mu_triv, width, k0, k1, T, n_steps):
-    """Evolve the wavefunction starting at the k0-localized near-zero mode
-    through the full sweep of duration T; return fidelity against the
-    k1-localized near-zero mode of the final Hamiltonian."""
     dt = T / n_steps
 
     mu0 = wall_mu_profile(N, k0, width, mu_topo, mu_triv)
